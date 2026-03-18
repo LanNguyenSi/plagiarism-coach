@@ -102,9 +102,28 @@ Suggestions
 ```bash
 git clone https://github.com/LanNguyenSi/plagiarism-coach.git
 cd plagiarism-coach
-npm install
-npm run build
-npm link  # Make CLI globally available
+make install  # Install dependencies
+make build    # Build TypeScript
+make link     # Make CLI globally available
+
+# Or use npm directly:
+npm install && npm run build && npm link
+```
+
+### Quick Start (Makefile)
+
+```bash
+make help       # Show all available commands
+make demo       # Build and run demo with sample essay
+make test       # Run tests
+make clean      # Clean build artifacts
+```
+
+### Docker
+
+```bash
+make docker-build  # Build Docker image
+make docker-run    # Run in Docker container
 ```
 
 ### Usage
