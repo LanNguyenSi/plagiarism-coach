@@ -1,14 +1,10 @@
 # Tasks
 
-Task files for plagiarism-coach development backlog.
+Tracked backlog items for plagiarism-coach.
 
-## Open Tasks
+The current tracked backlog in this directory has been completed.
 
-| Task | Title | Priority | Wave |
-|------|-------|----------|------|
-| 004 | Web Search Integration (Brave API) | medium | 2 |
-| 012 | Unit Tests for Core Components | high | 3 |
-| 013 | README + Examples Documentation | high | 4 |
+See `status.md` for the latest completion summary.
 
 ## Task Format
 

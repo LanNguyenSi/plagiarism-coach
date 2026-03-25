@@ -1,13 +1,23 @@
 import natural from 'natural';
 import { DetectionResult, DetectionMode } from '../models/types.js';
+import { Attributor } from './attributor.js';
 
 const { TfIdf, SentenceTokenizer } = natural;
 
+export interface DetectorOptions {
+  attributor?: Attributor;
+  webSimilarityThreshold?: number;
+}
+
 export class Detector {
   private tokenizer: any;
-  
-  constructor() {
+  private readonly attributor: Attributor;
+  private readonly webSimilarityThreshold: number;
+
+  constructor(options: DetectorOptions = {}) {
     this.tokenizer = new (SentenceTokenizer as any)();
+    this.attributor = options.attributor || new Attributor();
+    this.webSimilarityThreshold = options.webSimilarityThreshold || 50;
   }
   
   /**
@@ -18,12 +28,13 @@ export class Detector {
    */
   async analyze(text: string, mode: DetectionMode = 'local'): Promise<DetectionResult[]> {
     const sentences = this.tokenize(text);
-    
-    // For MVP: only local TF-IDF analysis
-    // Web search will be added later
     const results = await this.tfIdfAnalysis(text, sentences);
-    
-    return results;
+
+    if (mode === 'local' || results.length === 0) {
+      return results;
+    }
+
+    return this.attachSources(results);
   }
   
   /**
@@ -95,6 +106,28 @@ export class Detector {
     });
     
     return results;
+  }
+
+  private async attachSources(results: DetectionResult[]): Promise<DetectionResult[]> {
+    const enrichedResults = await Promise.all(
+      results.map(async (result) => {
+        if (result.similarity < this.webSimilarityThreshold) {
+          return result;
+        }
+
+        try {
+          const sources = await this.attributor.findSources(result.passage, 3);
+          return {
+            ...result,
+            sources
+          };
+        } catch {
+          return result;
+        }
+      })
+    );
+
+    return enrichedResults;
   }
   
   /**

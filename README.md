@@ -1,420 +1,208 @@
-# PlagiarismCoach 🎓
+# PlagiarismCoach
 
-**Educational plagiarism detection tool that teaches students how to write and cite correctly, instead of just punishing them.**
+Educational plagiarism detection for students and teachers. The goal is not to punish. The goal is to explain where writing is too close to a source, show how to improve it, and suggest how to cite it correctly.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+## Overview
 
-## Philosophy
+PlagiarismCoach currently focuses on three core capabilities:
 
-Traditional plagiarism detection tools give you a percentage score and mark copied text in red. Students learn "don't get caught" instead of "how to write properly."
+- Local TF-IDF similarity detection for sentence-level overlap inside a draft.
+- Optional Brave Search lookups to suggest likely original web sources for high-similarity passages.
+- Educational feedback and citation suggestions in APA, MLA, and Chicago formats.
 
-**PlagiarismCoach is different:**
+The CLI is designed as a teaching aid. It highlights risky passages, suggests revision strategies, and keeps the process transparent.
 
-- ✅ **Teaches** instead of punishes
-- ✅ **Guides** step-by-step improvements
-- ✅ **Explains** why passages need work
-- ✅ **Provides** citation examples
-- ✅ **Respects** student privacy (local-first analysis)
+## Why Use It
 
-> "Every plagiarized passage is a chance to teach a student how to write better."
-
-## Features
-
-### 🔍 Smart Detection
-- **TF-IDF similarity analysis** for local detection (no API needed)
-- **Sentence-level granularity** for precise feedback
-- **50%+ similarity threshold** to avoid false positives
-- **Fast:** <2 seconds for 1000-word essays
-
-### 🎓 Progressive Feedback (3 Levels)
-
-**Level 1: Gentle Hint** (default)
-```
-💡 This passage is very close to another source.
-   Try explaining the concept in your own words.
-```
-
-**Level 2: Specific Guidance** (`--help-level 2`)
-```
-🎯 How to improve:
-1. Read and close the source
-2. Explain without looking
-3. Use different structure
-
-Key concepts to rephrase: mitochondria, powerhouse, cell
-```
-
-**Level 3: Example Paraphrase** (`--help-level 3`)
-```
-📝 Example approach:
-Instead of the original phrasing, you could:
-1. Start with the main point, then add details
-2. Use active voice instead of passive
-3. Break one long sentence into two shorter ones
-
-⚠️ Remember: This is just to show the PROCESS. Write your own version!
-```
-
-### 📚 Citation Support
-
-**Multi-format citations:**
-- APA (American Psychological Association)
-- MLA (Modern Language Association)
-- Chicago (Chicago Manual of Style)
-
-**Educational guidance:**
-- When to cite (not just how)
-- In-text vs. bibliography citations
-- Common knowledge exceptions
-
-### 📊 Beautiful Reports
-
-Terminal output with colors, emojis, and clear structure:
-
-```
-📊 Plagiarism Analysis Report
-═══════════════════════════════════════════
-
-Summary
-───────────────────────────────────────────
-Total passages analyzed: 2
-Overall similarity: 63%
-  • High similarity (>70%): 0
-  • Medium similarity (50-70%): 2
-  • Low similarity (<50%): 0
-
-Suggestions
-───────────────────────────────────────────
-🟡 Moderate similarity. Good start, but needs more original phrasing.
-💡 Vary your sentence structure and use synonyms.
-📚 Remember to cite ALL sources, even if you paraphrase well.
-```
+- Educational, not punitive: feedback explains what to fix and why.
+- Local-first: detection works without sending essays to a third-party service.
+- Source-aware: `web` and `hybrid` modes can attach likely web sources when a Brave API key is configured.
+- Scriptable: reports can be emitted as terminal text or JSON.
 
 ## Installation
 
 ### Prerequisites
-- Node.js 18+ (for development)
-- npm or yarn
+
+- Node.js 18+
+- npm
 
 ### From Source
 
 ```bash
 git clone https://github.com/LanNguyenSi/plagiarism-coach.git
 cd plagiarism-coach
-make install  # Install dependencies
-make build    # Build TypeScript
-make link     # Make CLI globally available
-
-# Or use npm directly:
-npm install && npm run build && npm link
+npm install
+npm run build
 ```
 
-### Quick Start (Makefile)
+To make the CLI available globally from your local checkout:
 
 ```bash
-make help       # Show all available commands
-make demo       # Build and run demo with sample essay
-make test       # Run tests
-make clean      # Clean build artifacts
+npm link
 ```
 
-### Docker
+## Quick Start
 
-```bash
-make docker-build  # Build Docker image
-make docker-run    # Run in Docker container
-```
-
-### Usage
-
-```bash
-# Basic analysis
-plagiarism-coach check essay.txt
-
-# With specific citation format
-plagiarism-coach check essay.txt --format apa
-
-# With more detailed feedback
-plagiarism-coach check essay.txt --help-level 2
-
-# Save report to file
-plagiarism-coach check essay.txt --output report.md
-
-# JSON output (for programmatic use)
-plagiarism-coach check essay.txt --json
-```
-
-## CLI Commands
-
-### `check` - Analyze text for plagiarism
-
-```bash
-plagiarism-coach check <file> [options]
-
-Options:
-  --format <type>     Citation format (apa|mla|chicago) [default: apa]
-  --mode <mode>       Detection mode (local|web|hybrid) [default: local]
-  --help-level <n>    Feedback level (1=hint, 2=guidance, 3=example) [default: 1]
-  --output <file>     Save report to file
-  --json              Output as JSON
-```
-
-### `cite` - Generate citation for a URL
-
-```bash
-plagiarism-coach cite <url> [options]
-
-Options:
-  --format <type>  Citation format (apa|mla|chicago) [default: apa]
-  --type <type>    Citation type (bibliography|in-text) [default: bibliography]
-```
-
-### `learn` - Interactive tutorial
-
-```bash
-plagiarism-coach learn [topic]
-
-Topics:
-  paraphrasing   Learn how to paraphrase effectively
-  citing         Learn when and how to cite
-  formats        Learn citation formats (APA/MLA/Chicago)
-```
-
-## Examples
-
-### Example 1: Basic Analysis
-
-**Input:** `essay.txt`
-```
-The mitochondria is the powerhouse of the cell. This organelle is 
-responsible for producing ATP through cellular respiration. The 
-mitochondria is the powerhouse of the cell, providing energy for 
-all cellular activities.
-```
-
-**Command:**
-```bash
-plagiarism-coach check essay.txt
-```
-
-**Output:**
-```
-📊 Plagiarism Analysis Report
-
-Summary
-───────────────────────────────────────────
-Total passages analyzed: 2
-Overall similarity: 63%
-
-Finding #1 (Sentence 1)
-"The mitochondria is the powerhouse of the cell."
-
-Similarity: 63%
-
-💡 Parts of this passage are similar to other content. 
-   Consider paraphrasing to make it more unique.
-```
-
-### Example 2: Detailed Guidance
-
-**Command:**
-```bash
-plagiarism-coach check essay.txt --help-level 2 --format apa
-```
-
-**Output includes:**
-```
-🎯 How to improve:
-
-1. Vary your phrasing: Use different words to express the same idea
-2. Add context: Explain WHY this matters
-
-Key concepts to rephrase: mitochondria, powerhouse, cell
-```
-
-## How It Works
-
-### 1. Detection Engine (TF-IDF)
-
-PlagiarismCoach uses **Term Frequency-Inverse Document Frequency (TF-IDF)** to measure text similarity:
-
-1. Text is tokenized into sentences
-2. Each sentence is converted to a TF-IDF vector
-3. Cosine similarity is calculated between sentences
-4. Passages with >50% similarity are flagged
-
-**Why TF-IDF?**
-- Fast (local processing, no API needed)
-- Privacy-preserving (nothing leaves your machine)
-- Effective for detecting duplicate/similar content
-- No rate limits or API costs
-
-### 2. Feedback System
-
-Instead of just marking text red, PlagiarismCoach:
-
-1. Identifies the specific issue (similarity score)
-2. Explains WHY it's problematic (educational context)
-3. Suggests HOW to improve (actionable steps)
-4. Provides examples when requested (progressive disclosure)
-
-### 3. Citation Generator
-
-Uses the `citation-js` library to generate proper citations:
-
-- Automatic format conversion (APA ↔ MLA ↔ Chicago)
-- Handles web pages, books, articles, etc.
-- Includes access dates for web sources
-- Validates citation structure
-
-## Development
-
-### Project Structure
-
-```
-plagiarism-coach/
-├── src/
-│   ├── cli/           # Command-line interface
-│   │   ├── index.ts   # CLI entry point
-│   │   ├── check.ts   # Check command
-│   │   ├── cite.ts    # Cite command
-│   │   └── learn.ts   # Learn command
-│   ├── core/          # Core functionality
-│   │   ├── detector.ts    # TF-IDF similarity detection
-│   │   ├── rewriter.ts    # Feedback generation
-│   │   └── citator.ts     # Citation formatting
-│   ├── models/        # Data models
-│   │   ├── types.ts   # TypeScript interfaces
-│   │   └── report.ts  # Report generator
-│   └── utils/         # Utilities
-├── examples/          # Sample files
-├── tests/             # Unit tests
-└── docs/             # Additional documentation
-```
-
-### Tech Stack
-
-- **Language:** TypeScript (strict mode)
-- **CLI Framework:** Commander.js
-- **NLP:** Natural (TF-IDF, tokenization)
-- **Citations:** citation-js
-- **Terminal UI:** chalk, ora
-- **Testing:** Vitest
-
-### Running Tests
-
-```bash
-npm test
-```
-
-### Building
+1. Build the CLI:
 
 ```bash
 npm run build
 ```
 
-### Development Mode (watch)
+2. Analyze the bundled sample essay:
 
 ```bash
+node dist/cli/index.js check examples/sample-essay.txt --help-level 2
+```
+
+3. Save a plain-text report:
+
+```bash
+node dist/cli/index.js check examples/sample-essay.txt --output report.md
+```
+
+You can compare against the example output in [examples/sample-report.md](examples/sample-report.md).
+
+## Configuration
+
+PlagiarismCoach works without API keys in `local` mode. To enable Brave Search enrichment for `web` or `hybrid` mode, copy `.env.example` or export the variable directly:
+
+```bash
+export BRAVE_SEARCH_API_KEY=your_brave_search_api_key_here
+```
+
+Environment variables:
+
+- `BRAVE_SEARCH_API_KEY`: enables Brave Search lookups for likely source attribution.
+
+## Commands
+
+### `check`
+
+Analyze a text file and generate educational feedback.
+
+```bash
+plagiarism-coach check <file> [options]
+```
+
+Options:
+
+- `--format <type>`: `apa`, `mla`, or `chicago`
+- `--mode <mode>`: `local`, `web`, or `hybrid`
+- `--help-level <n>`: `1`, `2`, or `3`
+- `--output <file>`: save the rendered report to a file
+- `--json`: emit JSON instead of formatted terminal output
+
+Examples:
+
+```bash
+plagiarism-coach check essay.txt
+plagiarism-coach check essay.txt --mode hybrid --format apa
+plagiarism-coach check essay.txt --help-level 3 --output report.md
+plagiarism-coach check essay.txt --json
+```
+
+Mode behavior:
+
+- `local`: only local TF-IDF similarity detection
+- `web`: local detection plus Brave source lookup for flagged passages
+- `hybrid`: same as `web`, but named explicitly for mixed local + web analysis
+
+If Brave Search is unavailable or the API call fails, analysis still completes and returns local results.
+
+### `cite`
+
+Show the current citation-generator command surface.
+
+```bash
+plagiarism-coach cite <url> [options]
+```
+
+Options:
+
+- `--format <type>`: `apa`, `mla`, or `chicago`
+- `--type <type>`: `bibliography` or `in-text`
+
+Note: the dedicated `cite` command is still scaffolded, while citation formatting is already used internally by `check`.
+
+### `learn`
+
+Show the current tutorial command surface.
+
+```bash
+plagiarism-coach learn [topic]
+```
+
+Topics:
+
+- `paraphrasing`
+- `citing`
+- `formats`
+
+Note: the interactive tutorial flow is still scaffolded.
+
+## Examples
+
+- Input essay: [examples/sample-essay.txt](examples/sample-essay.txt)
+- Expected report style: [examples/sample-report.md](examples/sample-report.md)
+
+Example analysis run:
+
+```bash
+node dist/cli/index.js check examples/sample-essay.txt --mode local --help-level 2
+```
+
+Example JSON run:
+
+```bash
+node dist/cli/index.js check examples/sample-essay.txt --json
+```
+
+## Development
+
+Useful commands:
+
+```bash
+npm run build
+npm test
+npm run test:coverage
 npm run dev
 ```
 
-## Roadmap
+Project structure:
 
-### MVP (Current)
-- [x] TF-IDF local detection
-- [x] Progressive feedback system (3 levels)
-- [x] Citation generator (APA/MLA/Chicago)
-- [x] CLI interface
-- [x] Markdown reports
+```text
+src/
+  cli/          Commander-based commands
+  core/         Detector, attributor, rewriter, citator
+  models/       Shared report and domain types
+  utils/        External API clients
+examples/       Sample essay and report output
+tasks/          Backlog items and status tracking
+```
 
-### Future Features
-- [ ] Web search integration (find original sources)
-- [ ] AI-powered paraphrasing hints (Claude/GPT)
-- [ ] Progress tracking over time
-- [ ] Interactive tutorial mode
-- [ ] VSCode extension
-- [ ] Web UI
-- [ ] Multi-language support
+## FAQ
 
-## Why PlagiarismCoach?
+### Does this upload essays anywhere?
 
-### For Students
+Not in `local` mode. In `web` and `hybrid` mode, only flagged passages are sent to Brave Search if `BRAVE_SEARCH_API_KEY` is configured.
 
-**Traditional Tool:**
-> "This text is 85% plagiarized. Grade: F."
+### Do I need an API key to use the tool?
 
-**PlagiarismCoach:**
-> "Here are 3 passages that need citation. Let me show you how to rewrite them properly and cite your sources."
+No. Local detection, feedback generation, report formatting, and citation suggestions all work without one.
 
-**Key Difference:** Learn a skill, not just avoid punishment.
+### Why do `cite` and `learn` look incomplete?
 
-### For Teachers
+The core educational detection flow is implemented first. The standalone `cite` and `learn` commands remain scaffolded and are documented honestly as such.
 
-- **Saves time:** Automated feedback at scale
-- **Consistent:** Same high-quality guidance for every student
-- **Educational:** Students actually learn, not just copy-paste less
-- **Privacy:** No student essays stored in external databases
+### What does the similarity score mean?
 
-### For Self-Learners
-
-- **Free:** No subscription needed
-- **Local-first:** Works offline
-- **Transparent:** See exactly what was detected and why
-- **Skill-building:** Improve your academic writing
-
-## Comparison
-
-| Feature | Turnitin | Grammarly | **PlagiarismCoach** |
-|---------|----------|-----------|---------------------|
-| Detects plagiarism | ✅ | ✅ | ✅ |
-| Shows similarity % | ✅ | ✅ | ✅ |
-| **Teaches paraphrasing** | ❌ | ❌ | **✅** |
-| **Explains WHY** | ❌ | Partial | **✅** |
-| **Guided improvement** | ❌ | ❌ | **✅** |
-| **Growth tracking** | ❌ | ❌ | **Planned** |
-| **Privacy-first** | ❌ | ❌ | **✅** |
-| **Free & Open Source** | ❌ | ❌ | **✅** |
+It is a heuristic sentence-level similarity score from the local TF-IDF detector. It helps identify passages that likely need paraphrasing or citation review. It is not a formal academic misconduct verdict.
 
 ## Contributing
 
-Contributions welcome! This project is in active development.
-
-**How to contribute:**
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-**Contribution areas:**
-- Improve detection accuracy
-- Add more citation formats
-- Translate to other languages
-- Write better educational content
-- Improve UI/UX
-- Add tests
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing expectations, and pull request guidelines.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Acknowledgments
-
-- Inspired by the need for better educational tools
-- Built with modern NLP and TypeScript
-- Designed with student privacy in mind
-- Philosophy: "Teach, don't punish"
-
-## Support
-
-- 🐛 **Bug reports:** [GitHub Issues](https://github.com/LanNguyenSi/plagiarism-coach/issues)
-- 💡 **Feature requests:** [GitHub Discussions](https://github.com/LanNguyenSi/plagiarism-coach/discussions)
-- 📧 **Email:** ice@openclaw.ai
-
----
-
-**Built with ❄️ by Ice**
-
-*"Every mistake is a learning opportunity, not a crime."*
+MIT. See [LICENSE](LICENSE).
