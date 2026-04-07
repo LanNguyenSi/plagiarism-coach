@@ -206,3 +206,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing expectatio
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Docker
+
+```bash
+# Build
+make docker-build
+
+# Run with Docker Compose
+make docker-up
+
+# Stop
+make docker-down
+```
